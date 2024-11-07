@@ -12,12 +12,10 @@ import com.demo.oragejobsite.dao.PostjobDao;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
 import java.util.HashSet;
 import java.util.Set;
 import java.util.ArrayList;
@@ -28,6 +26,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.stream.Collectors;
+
+
+
+
 
 @CrossOrigin(origins = "${myapp.url}")
 @RestController
@@ -57,10 +59,7 @@ public class FollowController {
             List<Follow> follows = followRepository.findAll();
             return ResponseEntity.ok(follows);
         } catch (Exception e) {
-            // Log the exception (optional)
             e.printStackTrace();
-
-            // Return an internal server error response
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body("An error occurred while fetching all follows: " + e.getMessage());
         }
@@ -73,10 +72,7 @@ public class FollowController {
                     .map(ResponseEntity::ok)
                     .orElse(ResponseEntity.notFound().build());
         } catch (Exception e) {
-            // Log the exception (optional)
             e.printStackTrace();
-
-            // Return an internal server error response
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body("An error occurred while fetching follow by ID: " + e.getMessage());
         }
@@ -86,15 +82,11 @@ public class FollowController {
     @PostMapping
     public ResponseEntity<?> toggleFollow(@RequestBody Follow follow) {
         try {
-            // Check if a follow record already exists for the given uid and empid
             List<Follow> existingFollows = followRepository.findByUidAndEmpid(follow.getUid(), follow.getEmpid());
-            
             if (!existingFollows.isEmpty()) {
-                // If exists, delete the existing follow record (unfollow)
                 followRepository.deleteAll(existingFollows);
                 return ResponseEntity.status(HttpStatus.OK).body("Unfollowed successfully.");
             } else {
-                // If not exists, create a new follow record (follow)
                 Follow savedFollow = followRepository.save(follow);
                 return ResponseEntity.status(HttpStatus.CREATED).body(savedFollow);
             }
@@ -127,39 +119,9 @@ public class FollowController {
         }
     }
 
-//    @GetMapping("/byuid")
-//    public ResponseEntity<?> getFollowsByUid(@RequestParam String uid, 
-//    		@RequestParam(defaultValue = "0") int page,
-//            @RequestParam(defaultValue = "3") int size) {
-//    	try {
-//    		Pageable pageable = PageRequest.of(page, size);
-//            Page<Follow> followPage = followRepository.findByUid(uid, pageable);
-//
-//            if (followPage.isEmpty()) {
-//                return ResponseEntity.status(HttpStatus.NOT_FOUND).body("No follows found for the given UID.");
-//            }
-//
-////            List<Follow> follows = followPage.getContent();
-//            if (followPage.isEmpty()) {
-//                return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
-//            } else {
-//            	Map<String, Object> response = new HashMap<>();
-//                response.put("followers", followPage.getContent());
-//                response.put("currentPage", followPage.getNumber());
-//                response.put("totalItems", followPage.getTotalElements());
-//                response.put("totalPages", followPage.getTotalPages());
-//                return ResponseEntity.ok(response);
-//            }
-////            return ResponseEntity.ok(follows);
-//        } catch (Exception e) {
-//            // Log the exception (optional)
-//            e.printStackTrace();
-//
-//            // Return an internal server error response
-//            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-//                    .body("An error occurred while fetching follows by UID: " + e.getMessage());
-//        }
-//    }
+
+
+
     @GetMapping("/byuid")
     public ResponseEntity<?> getFollowsByUid(
             @RequestParam String uid,

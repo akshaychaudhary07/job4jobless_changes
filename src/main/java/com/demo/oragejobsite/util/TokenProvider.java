@@ -85,26 +85,6 @@ public class TokenProvider {
        
     }
 
-//    public java.sql.Date getExpirationDateFromRefreshToken(String refreshToken) {
-//        try {
-//            Claims claims = Jwts.parserBuilder()
-//                .setSigningKey(jwtSecret)
-//                .build()
-//                .parseClaimsJws(refreshToken)
-//                .getBody();
-//
-//            Date expirationDate = claims.getExpiration();
-//
-//            if (expirationDate != null) {
-//                // Convert the expiration date to a SQL Date
-//                return new java.sql.Date(expirationDate.getTime());
-//            }
-//        } catch (Exception e) {
-//            e.printStackTrace();
-//        }
-//
-//        return null;
-//    }
     
     public java.sql.Date getExpirationDateFromRefreshToken(String refreshToken) throws SQLException {
         try {

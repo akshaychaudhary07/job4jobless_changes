@@ -5,7 +5,7 @@ import org.springframework.data.mongodb.core.mapping.Document;
 
 @Document(collection = "admin")
 public class Admin {
-@Id
+	 @Id
 private String adminid;
 private String adminName;
 private String adminMail;

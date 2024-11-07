@@ -9,7 +9,6 @@ import java.util.UUID;
 import java.lang.reflect.Field;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletResponse;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
 import org.springframework.data.domain.Page;
@@ -26,25 +25,15 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-
 import com.demo.oragejobsite.dao.RefreshTokenRepository;
 import com.demo.oragejobsite.dao.UserDao;
 import com.demo.oragejobsite.entity.RefreshToken;
 import com.demo.oragejobsite.entity.User;
-
 import com.demo.oragejobsite.util.TokenProvider;
-
-
-
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
-
-
 @CrossOrigin(origins = "${myapp.url}")
 @RestController
 public class UserController {
@@ -117,12 +106,10 @@ public ResponseEntity<?> fetchuser(
 	 try {
 	        Pageable pageable = PageRequest.of(page, size);
 	        Page<User> users;
-	        
 	        if(name!=null && !name.isEmpty()) {
 	        	users=ud.findByUserFirstNameOrUserLastNameRegexIgnoreCase(name, pageable);
 	        }
-	        else if (uid != null) {
-	        	
+	        else if (uid != null) {	        	
 	            Optional<User> optionalUser = ud.findByUid(uid);
 	            List<User> userList = new ArrayList<>();
 	            optionalUser.ifPresent(userList::add);
@@ -130,7 +117,6 @@ public ResponseEntity<?> fetchuser(
 	        } else {
 	            users = ud.findAll(pageable);
 	        }
-
 	        if (users.isEmpty()) {
 	            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
 	        } else {
@@ -147,7 +133,6 @@ public ResponseEntity<?> fetchuser(
 }
 
 
-// Fetch User By uid
 @CrossOrigin(origins = "${myapp.url}")
 @GetMapping("/fetchuserById/{uid}")
 public ResponseEntity<User> fetchUserById(@PathVariable String uid) {
@@ -216,9 +201,11 @@ public ResponseEntity<?> logincheck(@RequestBody User c12, HttpServletResponse r
         String checkpass = c12.getUserPassword();
         checkpass = hashPassword(checkpass);
         User checkmail = checkMailUser(checkemail, checkpass);
+        System.out.println("testing the data is coming proper or not " +checkmail);
         if (checkmail != null) {
             if (checkmail.isVerified()) {
                if(!checkmail.isAccdeactivate()) {
+            	   System.out.println("testng the code  "+checkmail.isAccdeactivate());
             	   Cookie userCookie = new Cookie("user", checkemail);
                    userCookie.setMaxAge(3600);
                    userCookie.setPath("/");
@@ -236,7 +223,21 @@ public ResponseEntity<?> logincheck(@RequestBody User c12, HttpServletResponse r
                    responseBody.put("uid", checkmail.getUid());
                    return ResponseEntity.ok(responseBody);
                }else {
-                   return ResponseEntity.status(HttpStatus.FORBIDDEN).body("User account is deactivated");
+            	   checkmail.setAccdeactivate(false);
+            	   System.out.println("testng the code  "+checkmail.isAccdeactivate());
+            	   String refreshToken = tokenProvider.generateRefreshToken(checkemail, checkmail.getUid());
+                   RefreshToken refreshTokenEntity = new RefreshToken();
+                   refreshTokenEntity.setTokenId(refreshToken);
+                   refreshTokenEntity.setUsername(checkmail.getUid());
+                   refreshTokenEntity.setExpiryDate(tokenProvider.getExpirationDateFromRefreshToken(refreshToken));
+                   refreshTokenRepository.save(refreshTokenEntity);
+                   String accessToken = tokenProvider.generateAccessToken(checkmail.getUid());
+                   Map<String, Object> responseBody = new HashMap<>();
+                   responseBody.put("accessToken", accessToken);
+                   responseBody.put("refreshToken", refreshToken);
+                   responseBody.put("uid", checkmail.getUid());
+                   return ResponseEntity.ok(responseBody);
+//                   return ResponseEntity.status(HttpStatus.FORBIDDEN).body("User account is deactivated");
                }
             } else {
                 // User account is not verified
@@ -246,14 +247,17 @@ public ResponseEntity<?> logincheck(@RequestBody User c12, HttpServletResponse r
             // Check if email exists in the database
             User userByEmail = ud.findByUserName(checkemail);
             if (userByEmail != null) {
+            	System.out.println("Mail not found");
                 // Incorrect password
                 return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Incorrect password");
             } else {
                 // Email not found
+            	System.out.println("Mail not found");
                 return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Email not found");
             }
         }
     } catch (Exception e) {
+    	System.out.println("Error not found");
         e.printStackTrace();
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("An error occurred while processing your request");
     }
@@ -272,7 +276,7 @@ public ResponseEntity<?> logincheckgmail(@RequestBody User c12, HttpServletRespo
            if (userOptional.isPresent()) {
                User user = userOptional.get();
                if (user.isAccdeactivate()) {
-               
+            	   System.out.println("testng the code  "+user.isAccdeactivate());
                    return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Account is deactivated");
                }
                Cookie userCookie = new Cookie("user", checkemail);
@@ -302,7 +306,6 @@ public ResponseEntity<?> logincheckgmail(@RequestBody User c12, HttpServletRespo
                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Failed to fetch UID");
            }
        } else {
-           // Email doesn't exist, return an unauthorized response
            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid username or password");
        }
    } catch (Exception e) {
@@ -321,12 +324,12 @@ public boolean checkIfEmailExists(String email) {
 private User checkMailUser(String checkemail, String checkpass) {
     // Find the user with the provided email
     User user = ud.findByUserName(checkemail);
-    
+    System.out.println("Mail not found");
     // If user not found or password doesn't match, return null
     if (user == null || !user.getUserPassword().equals(checkpass)) {
         return null;
     }
-    
+    System.out.println("Mail not found");
     // Return the user if all conditions are met
     return user;
 }
@@ -664,6 +667,4 @@ private User checkMailUser(String checkemail, String checkpass) {
         }
     }
 
-    
-   
 }

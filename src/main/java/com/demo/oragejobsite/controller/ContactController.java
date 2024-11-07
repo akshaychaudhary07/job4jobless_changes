@@ -44,7 +44,18 @@ public class ContactController {
 	}
 
 	
-
+	
+//	@CrossOrigin(origins = "${myapp.url}")
+//	@GetMapping("/fetchcontact")
+//	public ResponseEntity<List<Contact>> fetchcontact() {
+//	    try {
+//	        List<Contact> contacts = cd.findAll();
+//	        return ResponseEntity.ok(contacts);
+//	    } catch (Exception e) {
+//	        e.printStackTrace();
+//	        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
+//	    }
+//	}
 	@CrossOrigin(origins = "${myapp.url}")
 	@GetMapping("/fetchcontact")
 	public ResponseEntity<?> fetchcontact(

@@ -43,7 +43,18 @@ public class ContactContro {
 	    }
 	}
 	
-
+//	
+//	@CrossOrigin(origins = "${myapp.url}")
+//	@GetMapping("/fetchcontactfront")
+//	public ResponseEntity<List<DirectConntact>> fetchcontactfront() {
+//	    try {
+//	        List<DirectConntact> contacts = contatfront.findAll();
+//	        return ResponseEntity.ok(contacts);
+//	    } catch (Exception e) {
+//	        e.printStackTrace();
+//	        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
+//	    }
+//	}
 
 	@CrossOrigin(origins = "${myapp.url}")
 	@GetMapping("/fetchcontactfront")

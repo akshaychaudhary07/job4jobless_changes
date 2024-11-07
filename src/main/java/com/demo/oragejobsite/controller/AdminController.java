@@ -162,7 +162,7 @@ public class AdminController {
                 admin.ifPresent(admindata::add); 
         	}else {
                 admindata = admindao.findAll();
-        	}
+            }
             return ResponseEntity.status(HttpStatus.OK).body(admindata);
         } catch (Exception e) {
             e.printStackTrace();

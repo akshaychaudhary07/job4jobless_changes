@@ -20,6 +20,8 @@ import com.demo.oragejobsite.entity.Notification;
 public class NotificationController {
 	@Autowired
 	private NotificationDao nd;
+	
+	
 	@CrossOrigin(origins = "${myapp.url}")
 	@PostMapping("/insertnotification")
 	public ResponseEntity<Boolean> insertnotification(@RequestBody Notification nn) {
@@ -46,4 +48,6 @@ public class NotificationController {
 	        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
 	    }
 	}
+
+	
 }

@@ -126,6 +126,50 @@ public ResponseEntity<List<Employer>> fetchemployerName(@RequestParam(required =
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
     }
 }
+//@CrossOrigin(origins = "${myapp.url}")
+//@GetMapping("/fetchemployer")
+//public ResponseEntity<?> fetchemployer(
+//		@RequestParam(required = false) String empid,
+//		@RequestParam(defaultValue = "0") int page,
+//	    @RequestParam(defaultValue = "10") int size,
+//	    @RequestParam(required = false) String name,
+//	    @RequestParam(required = false) String companyName) {
+  //  try {
+    //	Pageable pageable = PageRequest.of(page, size);
+      //  Page<Employer> employee;
+        
+        //if(name!=null && !name.isEmpty() && companyName!=null && !companyName.isEmpty()) {
+        //	employee=ed.findByEmpNameAndCompanyName(name,companyName, pageable);
+   //     }
+     //   else if(name!=null && !name.isEmpty())
+       // {
+        //	employee=ed.findByEmpNameAndCompanyName(name,"", pageable);
+    //    }
+      //  else if(companyName!=null && !companyName.isEmpty()){
+        //	employee=ed.findByEmpNameAndCompanyName("",companyName, pageable);
+  //   }
+    //   else if (empid != null) {
+            // If UID is provided, fetch only the employer with the specified UID
+     //       Optional<Employer> employer = ed.findByEmpid(empid);
+  //          List<Employer> employerList = new ArrayList<>();
+    //        employer.ifPresent(employerList::add);
+      //      employee = new PageImpl<>(employerList, pageable, employerList.size());
+  //      } else {
+            // If UID is not provided, fetch all employers
+      //      employee = ed.findAll(pageable);
+    //    }
+        //if (employee.isEmpty()) {
+          //  return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+  //      } else {
+    //    	Map<String, Object> response = new HashMap<>();
+      //      response.put("employees", employee.getContent());
+        //    response.put("currentPage", employee.getNumber());
+          //  response.put("totalItems", employee.getTotalElements());
+            //response.put("totalPages", employee.getTotalPages());
+        //    return ResponseEntity.ok(response);
+      //  }
+   // } catch (Exception e) {
+     //   return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body
 
 
 

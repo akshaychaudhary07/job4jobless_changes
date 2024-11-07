@@ -5,7 +5,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
 import org.springframework.http.HttpStatus;
@@ -16,14 +15,12 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-
 import com.demo.oragejobsite.dao.ApplicantsCountDao;
 import com.demo.oragejobsite.dao.ApplyDao;
 import com.demo.oragejobsite.dao.UserStatusDao;
 import com.demo.oragejobsite.entity.ApplicantsCount;
 import com.demo.oragejobsite.entity.ApplyJob;
 import com.demo.oragejobsite.entity.UserStatus;
-
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
@@ -57,7 +54,7 @@ public class ApplyController {
             // Update ApplicantsCount based on jobid
             String jobid = applyjob.getJobid();
             // Rest of the code to update applicants count...
-ApplicantsCount applicantsCount = getApplicantsCountByJobId(jobid);
+	    ApplicantsCount applicantsCount = getApplicantsCountByJobId(jobid);
             if (applicantsCount == null) {
                 // If no entry exists for the jobid, create a new one
                 applicantsCount = new ApplicantsCount();
