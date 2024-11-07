@@ -126,51 +126,6 @@ public ResponseEntity<List<Employer>> fetchemployerName(@RequestParam(required =
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
     }
 }
-//@CrossOrigin(origins = "${myapp.url}")
-//@GetMapping("/fetchemployer")
-//public ResponseEntity<?> fetchemployer(
-//		@RequestParam(required = false) String empid,
-//		@RequestParam(defaultValue = "0") int page,
-//	    @RequestParam(defaultValue = "10") int size,
-//	    @RequestParam(required = false) String name,
-//	    @RequestParam(required = false) String companyName) {
-  //  try {
-    //	Pageable pageable = PageRequest.of(page, size);
-      //  Page<Employer> employee;
-        
-        //if(name!=null && !name.isEmpty() && companyName!=null && !companyName.isEmpty()) {
-        //	employee=ed.findByEmpNameAndCompanyName(name,companyName, pageable);
-   //     }
-     //   else if(name!=null && !name.isEmpty())
-       // {
-        //	employee=ed.findByEmpNameAndCompanyName(name,"", pageable);
-    //    }
-      //  else if(companyName!=null && !companyName.isEmpty()){
-        //	employee=ed.findByEmpNameAndCompanyName("",companyName, pageable);
-  //   }
-    //   else if (empid != null) {
-            // If UID is provided, fetch only the employer with the specified UID
-     //       Optional<Employer> employer = ed.findByEmpid(empid);
-  //          List<Employer> employerList = new ArrayList<>();
-    //        employer.ifPresent(employerList::add);
-      //      employee = new PageImpl<>(employerList, pageable, employerList.size());
-  //      } else {
-            // If UID is not provided, fetch all employers
-      //      employee = ed.findAll(pageable);
-    //    }
-        //if (employee.isEmpty()) {
-          //  return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
-  //      } else {
-    //    	Map<String, Object> response = new HashMap<>();
-      //      response.put("employees", employee.getContent());
-        //    response.put("currentPage", employee.getNumber());
-          //  response.put("totalItems", employee.getTotalElements());
-            //response.put("totalPages", employee.getTotalPages());
-        //    return ResponseEntity.ok(response);
-      //  }
-   // } catch (Exception e) {
-     //   return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body
-
 
 
 @CrossOrigin(origins = "${myapp.url}")
@@ -335,8 +290,26 @@ public ResponseEntity<?> employerLoginCheck(@RequestBody Employer employer, Http
                Employer foundEmployer = employerOptional.get();
                
                if (foundEmployer.isAccempldeactivate()) {
-                   
-                   return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Account is deactivated");
+            	   foundEmployer.setAccempldeactivate(false);
+            	   String accessToken = tokenProvider.generateAccessToken(foundEmployer.getEmpid());
+                   String refreshToken = tokenProvider.generateRefreshToken(checkEmail, foundEmployer.getEmpid());
+                   RefreshToken refreshTokenEntity = new RefreshToken();
+                   refreshTokenEntity.setTokenId(refreshToken);
+                   refreshTokenEntity.setUsername(foundEmployer.getEmpid());
+                   refreshTokenEntity.setExpiryDate(tokenProvider.getExpirationDateFromRefreshToken(refreshToken));
+                   refreshTokenRepository.save(refreshTokenEntity);
+                   Map<String, Object> responseBody = new HashMap<>();
+                   responseBody.put("accessToken", accessToken);
+                   responseBody.put("refreshToken", refreshToken);
+                   responseBody.put("empid", foundEmployer.getEmpid());
+                   responseBody.put("empfname", foundEmployer.getEmpfname());
+                   responseBody.put("emplname", foundEmployer.getEmplname());
+                   responseBody.put("empmailid", foundEmployer.getEmpmailid());
+                   responseBody.put("empcountry", foundEmployer.getEmpcountry());
+                   responseBody.put("empstate", foundEmployer.getEmpstate());
+                   responseBody.put("empcity", foundEmployer.getEmpcity());
+                   return ResponseEntity.ok(responseBody);
+//                   return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Account is deactivated");
                }
                Cookie employerCookie = new Cookie("emp", checkEmail);
                employerCookie.setMaxAge(3600);
@@ -415,7 +388,27 @@ public ResponseEntity<?> logincheckemp(@RequestBody Employer e12, HttpServletRes
                   responseBody.put("empcity", checkmail.getEmpcity());
                   return ResponseEntity.ok(responseBody);
               }else {
-            	  return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Employer Deactivate");
+            	  
+            	  checkmail.setAccempldeactivate(false);
+           	   String accessToken = tokenProvider.generateAccessToken(checkmail.getEmpid());
+                  String refreshToken = tokenProvider.generateRefreshToken(checkemail, checkmail.getEmpid());
+                  RefreshToken refreshTokenEntity = new RefreshToken();
+                  refreshTokenEntity.setTokenId(refreshToken);
+                  refreshTokenEntity.setUsername(checkmail.getEmpid());
+                  refreshTokenEntity.setExpiryDate(tokenProvider.getExpirationDateFromRefreshToken(refreshToken));
+                  refreshTokenRepository.save(refreshTokenEntity);
+                  Map<String, Object> responseBody = new HashMap<>();
+                  responseBody.put("accessToken", accessToken);
+                  responseBody.put("refreshToken", refreshToken);
+                  responseBody.put("empid", checkmail.getEmpid());
+                  responseBody.put("empfname", checkmail.getEmpfname());
+                  responseBody.put("emplname", checkmail.getEmplname());
+                  responseBody.put("empmailid", checkmail.getEmpmailid());
+                  responseBody.put("empcountry", checkmail.getEmpcountry());
+                  responseBody.put("empstate", checkmail.getEmpstate());
+                  responseBody.put("empcity", checkmail.getEmpcity());
+                  return ResponseEntity.ok(responseBody);
+//            	  return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Employer Deactivate");
               }
             } else {
                 return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("User not verified");
@@ -603,11 +596,30 @@ public ResponseEntity<Map<String, Object>> createOrGetEmployer(@RequestBody Map<
         if (existingEmployer != null) {
         	
         	   if (existingEmployer.isAccempldeactivate()) {
-                   // Account is deactivated, return unauthorized response
-                   Map<String, Object> errorResponse = new HashMap<>();
-                   System.out.println("checking the statement");
-                   errorResponse.put("error", "Account is deactivated");
-                   return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(errorResponse);
+//                   Map<String, Object> errorResponse = new HashMap<>();
+//                   System.out.println("checking the statement");
+//                   errorResponse.put("error", "Account is deactivated");
+//                   return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(errorResponse);
+        		   
+        		   existingEmployer.setAccempldeactivate(false);
+            	   String accessToken = tokenProvider.generateAccessToken(existingEmployer.getEmpid());
+                   String refreshToken = tokenProvider.generateRefreshToken(empmailid, existingEmployer.getEmpid());
+                   RefreshToken refreshTokenEntity = new RefreshToken();
+                   refreshTokenEntity.setTokenId(refreshToken);
+                   refreshTokenEntity.setUsername(existingEmployer.getEmpid());
+                   refreshTokenEntity.setExpiryDate(tokenProvider.getExpirationDateFromRefreshToken(refreshToken));
+                   refreshTokenRepository.save(refreshTokenEntity);
+                   Map<String, Object> responseBody = new HashMap<>();
+                   responseBody.put("accessToken", accessToken);
+                   responseBody.put("refreshToken", refreshToken);
+                   responseBody.put("empid", existingEmployer.getEmpid());
+                   responseBody.put("empfname", existingEmployer.getEmpfname());
+                   responseBody.put("emplname", existingEmployer.getEmplname());
+                   responseBody.put("empmailid", existingEmployer.getEmpmailid());
+                   responseBody.put("empcountry", existingEmployer.getEmpcountry());
+                   responseBody.put("empstate", existingEmployer.getEmpstate());
+                   responseBody.put("empcity", existingEmployer.getEmpcity());
+                   return ResponseEntity.ok(responseBody);
                }
         	Cookie employerCookie = new Cookie("emp", empmailid);
             employerCookie.setMaxAge(3600);
@@ -723,7 +735,26 @@ public ResponseEntity<?> apploginemployer(@RequestBody Employer e12, HttpServlet
                return ResponseEntity.ok(responseBody);
         	   }
         	   else{
-        		   return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Employer Deactivate");
+        		   	  checkmail.setAccempldeactivate(false);
+                  	   String accessToken = tokenProvider.generateAccessToken(checkmail.getEmpid());
+                         String refreshToken = tokenProvider.generateRefreshToken(checkemail, checkmail.getEmpid());
+                         RefreshToken refreshTokenEntity = new RefreshToken();
+                         refreshTokenEntity.setTokenId(refreshToken);
+                         refreshTokenEntity.setUsername(checkmail.getEmpid());
+                         refreshTokenEntity.setExpiryDate(tokenProvider.getExpirationDateFromRefreshToken(refreshToken));
+                         refreshTokenRepository.save(refreshTokenEntity);
+                         Map<String, Object> responseBody = new HashMap<>();
+                         responseBody.put("accessToken", accessToken);
+                         responseBody.put("refreshToken", refreshToken);
+                         responseBody.put("empid", checkmail.getEmpid());
+                         responseBody.put("empfname", checkmail.getEmpfname());
+                         responseBody.put("emplname", checkmail.getEmplname());
+                         responseBody.put("empmailid", checkmail.getEmpmailid());
+                         responseBody.put("empcountry", checkmail.getEmpcountry());
+                         responseBody.put("empstate", checkmail.getEmpstate());
+                         responseBody.put("empcity", checkmail.getEmpcity());
+                         return ResponseEntity.ok(responseBody);
+//        		   return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Employer Deactivate");
         	   }
            } else {
                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("User not verified");
